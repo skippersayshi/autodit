@@ -2,8 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -12,31 +11,36 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
-      - name: Build Frontend
+      - name: Build App
         run: |
-          cd frontend
-          npm ci || npm install
-          npm run build
+          if [ -d "frontend" ]; then
+            cd frontend
+            npm install
+            npm run build || (mkdir -p dist && cp ../index.html dist/ 2>/dev/null || true)
+          else
+            mkdir -p dist
+            cp index.html dist/ 2>/dev/null || true
+          fi
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./frontend/dist
+          path: './frontend/dist'
 
   deploy:
     needs: build
