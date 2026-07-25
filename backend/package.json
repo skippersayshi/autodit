@@ -1,0 +1,7 @@
+{
+  "name": "mf-labs-audit-backend",
+  "version": "1.2.0",
+  "main": "dist/server.js",
+  "scripts": { "start": "node dist/server.js" },
+  "dependencies": { "fastify": "^4.20.0", "handlebars": "^4.7.7", "puppeteer": "^21.0.0", "zod": "^3.21.4" }
+}

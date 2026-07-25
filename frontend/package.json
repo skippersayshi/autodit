@@ -1,0 +1,7 @@
+{
+  "name": "mf-labs-audit-frontend",
+  "version": "1.2.0",
+  "private": true,
+  "scripts": { "dev": "vite", "build": "vite build" },
+  "dependencies": { "react": "^18.2.0", "react-dom": "^18.2.0", "zustand": "^4.4.0", "zod": "^3.21.4" }
+}
