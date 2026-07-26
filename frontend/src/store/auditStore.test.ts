@@ -1,10 +1,24 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+// @vitest-environment jsdom
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAuditStore } from './auditStore';
 
+// Veilige mock voor localStorage (voorkomt dat Zustand persist-middleware crasht in Vitest)
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => { store[key] = value.toString(); },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { store = {}; }
+  };
+})();
+
+vi.stubGlobal('localStorage', localStorageMock);
+
 describe('MF Labs Audit Store', () => {
-  // Reset de store voor elke test zodat we altijd schoon beginnen
   beforeEach(() => {
     useAuditStore.getState().resetAudit();
+    localStorage.clear();
   });
 
   it('moet initialiseren met lege waarden en de juiste standaard data structuur', () => {
@@ -20,23 +34,20 @@ describe('MF Labs Audit Store', () => {
     const state = useAuditStore.getState();
     expect(state.company.name).toBe('Saikou Tech');
     expect(state.company.sector).toBe('Software');
-    expect(state.company.email).toBe(''); // Onveranderde velden moeten behouden blijven
+    expect(state.company.email).toBe('');
   });
 
   it('moet de workflows correct toevoegen, overschrijven (JSON import) en verwijderen', () => {
     const wf1 = { id: 'wf-1', processName: 'Facturatie', timeSpentPerWeek: 5, keywords: 'factuur', description: 'test' };
     const wf2 = { id: 'wf-2', processName: 'Onboarding', timeSpentPerWeek: 12, keywords: 'contract', description: 'test2' };
     
-    // Voeg toe
     useAuditStore.getState().addWorkflow(wf1);
     expect(useAuditStore.getState().workflows.length).toBe(1);
 
-    // Overschrijf (simuleer JSON import via onze nieuwe actie)
     useAuditStore.getState().setWorkflows([wf1, wf2]);
     expect(useAuditStore.getState().workflows.length).toBe(2);
     expect(useAuditStore.getState().workflows[1].processName).toBe('Onboarding');
 
-    // Verwijder
     useAuditStore.getState().removeWorkflow('wf-1');
     expect(useAuditStore.getState().workflows.length).toBe(1);
     expect(useAuditStore.getState().workflows[0].id).toBe('wf-2');
