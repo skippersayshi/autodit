@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-echo "Build..."
+(cd frontend && npm run build) && (cd backend && npm run build)

@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-echo "Start dev..."
+(cd frontend && npm run dev)
