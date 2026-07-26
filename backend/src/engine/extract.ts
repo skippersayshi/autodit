@@ -1,1 +1,3 @@
-export function extractText(input: any) { return JSON.stringify(input).toLowerCase(); }
+export function extractText(input: any): string {
+  return JSON.stringify(input).toLowerCase();
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "=== [MF LABS] NOUWBOUW VOLLEDIGE VITE + REACT (NODE 22) MONOREPO ==="
+echo "=== [MF LABS] BOUWEN VOLLEDIGE VITE + REACT (NODE 22) MONOREPO ==="
 
 # 1. MAPSTRUCTUUR AANMAKEN
 mkdir -p .github/workflows scripts
@@ -612,3 +612,29 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+EOT
+
+# 7. SCRIPTS AANMAKEN & COMMITTEN TO GIT
+cat << 'EOT' > scripts/dev.sh
+#!/usr/bin/env bash
+(cd frontend && npm run dev)
+EOT
+
+cat << 'EOT' > scripts/build.sh
+#!/usr/bin/env bash
+(cd frontend && npm run build) && (cd backend && npm run build)
+EOT
+
+cat << 'EOT' > scripts/deploy.sh
+#!/usr/bin/env bash
+git push origin main
+EOT
+
+chmod +x scripts/*.sh
+
+echo "-> Committen en pushen naar GitHub..."
+git add .
+git commit -m "feat: herstel met volledige Vite React codebase en correcte build" || true
+git push origin main
+
+echo "=== SUCCESS! DE VOLLEDIGE VITE + REACT SCRIPT IS GEBOUWD EN GEPUSHT! ==="

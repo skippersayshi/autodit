@@ -1,7 +1,21 @@
 {
   "name": "mf-labs-audit-backend",
   "version": "1.2.0",
+  "private": true,
   "main": "dist/server.js",
-  "scripts": { "start": "node dist/server.js" },
-  "dependencies": { "fastify": "^4.20.0", "handlebars": "^4.7.7", "puppeteer": "^21.0.0", "zod": "^3.21.4" }
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.28.1",
+    "handlebars": "^4.7.8",
+    "puppeteer": "^22.12.1",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.3"
+  }
 }
