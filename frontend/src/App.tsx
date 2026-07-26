@@ -37,7 +37,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // JSON Vault Export Functions
+  // JSON Vault Export & Import Functions
   const handleExportJSON = () => {
     const exportData = {
       company: store.company,
@@ -55,58 +55,51 @@ export default function App() {
     anchor.remove();
   };
 
-  // JSON Vault Import Function (Geüpdatet met State Sync Fixes)
   const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
     const fileReader = new FileReader();
-    fileReader.readAsText(file, "UTF-8");
-    fileReader.onload = (event) => {
-      try {
-        const parsed = JSON.parse(event.target?.result as string);
-        
-        // 1. Bedrijf Sync
-        if (parsed.company) {
-          store.setCompany(parsed.company);
-          setCompName(parsed.company.name || '');
-          setCompEmail(parsed.company.email || '');
-          setCompContact(parsed.company.contactPerson || '');
-          setCompSector(parsed.company.sector || '');
-          setCompTools((parsed.company.toolsUsed || []).join(', '));
-        }
-        
-        // 2. Workflows Sync Fix
-        if (parsed.workflows && Array.isArray(parsed.workflows)) {
-          if (store.setWorkflows) {
-            store.setWorkflows(parsed.workflows);
-          } else {
-            // Fallback: verwijder oude en voeg nieuwe iteratief toe
-            store.workflows.forEach(w => store.removeWorkflow(w.id));
-            parsed.workflows.forEach((w: any) => store.addWorkflow(w));
+    if (e.target.files && e.target.files[0]) {
+      fileReader.readAsText(e.target.files[0], "UTF-8");
+      fileReader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target?.result as string);
+          
+          // 1. Bedrijf Sync
+          if (parsed.company) {
+            store.setCompany(parsed.company);
+            setCompName(parsed.company.name || '');
+            setCompEmail(parsed.company.email || '');
+            setCompContact(parsed.company.contactPerson || '');
+            setCompSector(parsed.company.sector || '');
+            setCompTools((parsed.company.toolsUsed || []).join(', '));
           }
-        }
+          
+          // 2. Workflows Sync (Verholpen bug: JSON data direct inladen)
+          if (parsed.workflows && Array.isArray(parsed.workflows)) {
+            store.setWorkflows(parsed.workflows);
+          }
 
-        // 3. Privacy Runner State Sync Fix
-        if (parsed.privacy) {
-          store.setPrivacy(parsed.privacy);
-          setPrivLocs((parsed.privacy.dataLocations || []).join(', '));
-          setPrivRisks(parsed.privacy.privacyRisks || '');
-          setPrivCompliance(parsed.privacy.avgComplianceLevel || 0);
+          // 3. Privacy Runner State Sync (Verholpen bug: lokale React state synct nu)
+          if (parsed.privacy) {
+            store.setPrivacy(parsed.privacy);
+            setPrivLocs(parsed.privacy.dataLocations.join(', ') || '');
+            setPrivRisks(parsed.privacy.privacyRisks || '');
+            setPrivCompliance(parsed.privacy.avgComplianceLevel || 0);
+          }
+          
+          // 4. Components Sync
+          if (parsed.components) store.setComponents(parsed.components);
+          
+          alert('Audit sessie succesvol geïmporteerd!');
+        } catch (err) {
+          alert('Fout bij inladen JSON bestand.');
         }
-        
-        // 4. Components Sync
-        if (parsed.components) store.setComponents(parsed.components);
-        
-        alert('Audit sessie succesvol geïmporteerd!');
-      } catch (err) {
-        alert('Fout bij inladen JSON bestand.');
-        console.error(err);
-      } finally {
-        // Fix: Reset de file input zodat hetzelfde bestand opnieuw geladen kan worden
-        e.target.value = '';
-      }
-    };
+      };
+    }
+  };
+
+  // Conceptuele PDF Download handler
+  const handleDownloadPDF = () => {
+    alert("Conceptual Backend Call: Downloading PDF... (In real scenario: fetch('http://localhost:3000/api/generate-pdf'))");
   };
 
   const handleSaveStep2 = () => {
@@ -161,24 +154,31 @@ export default function App() {
     const corpus = [
       compName, compSector, compTools,
       ...store.workflows.map(w => `${w.processName} ${w.keywords} ${w.description}`),
-      privRisks
+      privRisks,
+      privLocs // VERBETERING: privLocs toegevoegd aan corpus
     ].join(' ').toLowerCase();
 
     const rules = [
       { id: 'rule-invoice', triggers: ['factuur', 'invoice', 'betaling'], title: 'Factuur-Check Script', desc: 'Automatische controle van inkomende facturen.', tools: ['Mailbox Connector', 'OCR Engine'], base: 8 },
       { id: 'rule-mail', triggers: ['mail', 'inbox', 'klant'], title: 'Mail-Flow Agent', desc: 'Sorteert mails en verstuurt automatische opvolging.', tools: ['LLM Gateway', 'SMTP Broker'], base: 7 },
-      { id: 'rule-onboarding', triggers: ['onboarding', 'medewerker', 'contract'], title: 'Onboarding Automator', desc: 'Zet automatisch accounts en documenten klaar.', tools: ['HRM API', 'Identity Provider'], base: 6 }
+      { id: 'rule-onboarding', triggers: ['onboarding', 'medewerker', 'contract'], title: 'Onboarding Automator', desc: 'Zet automatisch accounts en documenten klaar.', tools: ['HRM API', 'Identity Provider'], base: 6 },
+      { id: 'rule-gdpr', triggers: ['gdpr', 'privacy', 'google drive', 'onedrive'], title: 'Privacy Sentinel', desc: 'Monitort data locaties en privacy-risico\'s.', tools: ['Compliance API', 'Data Loss Prevention'], base: 5 } // VERBETERING: privLocs specifieke regel
     ];
 
     const matched = rules.filter(r => r.triggers.some(t => corpus.includes(t)));
-    const selected = matched.length > 0 ? matched : [rules[0]];
+    
+    // VERBETERING: Flexibelere fallback logica
+    const selected = matched.length > 0 ? matched : [
+        { id: 'rule-gen-check', triggers: [], title: 'Algemeen Proces-Script', desc: 'Genereert een basis-script voor de proces-check.', tools: ['Mailbox Connector', 'OCR Engine'], base: 5 }
+    ];
 
     const totalHours = store.workflows.reduce((sum, w) => sum + w.timeSpentPerWeek, 0);
     const timeFactor = Math.min(1 + totalHours / 10, 2.0);
     const riskFactor = privRisks.length > 5 ? 1.3 : 1.0;
+    const locFactor = privLocs.length > 5 ? 1.1 : 1.0; // VERBETERING: privLocs meegewogen in impact
 
     const components = selected.map(c => {
-      const impactScore = Math.min(Math.round(c.base * timeFactor * riskFactor), 10);
+      const impactScore = Math.min(Math.round(c.base * timeFactor * riskFactor * locFactor), 10); // VERBETERING: impactScore berekend
       return {
         id: c.id,
         title: c.title,
@@ -199,8 +199,8 @@ export default function App() {
     : 'bg-white border-2 border-[#09090B] p-6 space-y-4';
 
   const btnPrimary = is3D
-    ? 'px-6 py-3 bg-[#FF3B00] text-white font-bold border-2 border-[#09090B] shadow-[6px_6px_0px_0px_#09090B] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all'
-    : 'px-6 py-3 bg-[#FF5722] text-white font-bold border-2 border-[#09090B] hover:bg-black hover:text-white transition-all';
+    ? 'px-6 py-3 bg-[#FF3B00] text-white font-bold border-2 border-[#09090B] shadow-[6px_6px_0px_0px_#09090B] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all flex items-center gap-2'
+    : 'px-6 py-3 bg-[#FF5722] text-white font-bold border-2 border-[#09090B] hover:bg-black hover:text-white transition-all flex items-center gap-2';
 
   const inputClass = is3D
     ? 'w-full bg-white border-2 border-[#09090B] p-2 text-black outline-none focus:shadow-[4px_4px_0px_0px_#FF3B00] transition-all'
@@ -237,7 +237,7 @@ export default function App() {
 
       <main className="max-w-7xl w-full mx-auto p-6 flex-1 space-y-6">
         <div className="flex justify-between items-center text-xs">
-          <span>{is3D ? '[STATUS: ACTIVE_SESSION] ------------ [SHORTCUT: Ctrl+Shift+D]' : 'SWISS BRUTALIST AUDIT ENGINE'}</span>
+          <span>{is3D ? '[STATUS: ACTIVE_SESSION] ------------ [LOC: NL_BREDA_NODE] ------------ [SHORTCUT: Ctrl+Shift+D]' : 'SWISS BRUTALIST AUDIT ENGINE'}</span>
           <button onClick={() => store.resetAudit()} className="text-[#FF3B00] font-bold underline">[ RESET STATE ]</button>
         </div>
 
@@ -323,6 +323,13 @@ export default function App() {
             )}
             <h2 className="text-xl font-black">04. PRIVACY &amp; ANALYSE RUNNER</h2>
             <input value={privLocs} onChange={(e) => setPrivLocs(e.target.value)} placeholder="Data locaties (Google Drive, OneDrive)" className={inputClass} />
+            {/* VERBETERING: privCompliance input toegevoegd (Verholpen ghost state) */}
+            {is3D && (
+              <div className="text-[10px] font-mono tracking-widest text-slate-500 border-b border-slate-200 pb-2 flex justify-between">
+                <span>INDEX PLATE #04.B — COMPLIANCE [SYS_ID: 884-DX]</span>
+              </div>
+            )}
+            <input value={privCompliance} type="number" min="0" max="100" onChange={(e) => setPrivCompliance(parseInt(e.target.value) || 0)} placeholder="Gemiddeld Compliance Niveau (0-100)" className={inputClass} />
             <textarea value={privRisks} onChange={(e) => setPrivRisks(e.target.value)} placeholder="Privacy risico's" className={inputClass} />
             <button onClick={runEngine} className={btnPrimary}>RUN ENGINE ⚡</button>
           </div>
@@ -372,7 +379,7 @@ export default function App() {
                       </div>
                       <p className="text-xs text-slate-600">{c.description}</p>
                       <div className="text-[10px] font-bold text-[#FF3B00]">
-                        ⚡ LINK: {c.requiredTools.join(' -> ')}
+                        ⚡ LINK: {c.requiredTools.join(' -&gt; ')}
                       </div>
                     </div>
                   ))}
@@ -381,7 +388,9 @@ export default function App() {
             </div>
 
             <div className="flex gap-4">
-              <button onClick={() => store.resetAudit()} className={btnPrimary}>START NIEUWE AUDIT -></button>
+              {/* VERBETERING: PDF Download knop toegevoegd (Verholpen ontbrekende knop) */}
+              <button onClick={handleDownloadPDF} className={btnPrimary}>[ DOWNLOAD PDF RAPPORTAGE ]</button>
+              <button onClick={() => store.resetAudit()} className={btnPrimary}>START NIEUWE AUDIT -&gt;</button>
             </div>
           </div>
         )}
