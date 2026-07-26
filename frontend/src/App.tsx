@@ -101,89 +101,89 @@ export default function App() {
   };
 
   return (
-    <div class="min-h-screen flex flex-col font-mono text-sm">
-      <header class="border-b border-[#242830] bg-[#121417] p-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-          <span class="font-bold text-[#00F0FF]">// MF LABS AUDIT REACT SUITE</span>
-          <span class="text-xs text-[#8A959E]">VITE + REACT + TS (NODE 22)</span>
+    <div className="min-h-screen flex flex-col font-mono text-sm">
+      <header className="border-b border-[#242830] bg-[#121417] p-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <span className="font-bold text-[#00F0FF]">// MF LABS AUDIT REACT SUITE</span>
+          <span className="text-xs text-[#8A959E]">VITE + REACT + TS (NODE 22)</span>
         </div>
       </header>
 
-      <main class="max-w-7xl w-full mx-auto p-6 flex-1 space-y-6">
-        <div class="border border-[#242830] bg-[#121417] p-4 flex justify-between text-xs">
+      <main className="max-w-7xl w-full mx-auto p-6 flex-1 space-y-6">
+        <div className="border border-[#242830] bg-[#121417] p-4 flex justify-between text-xs">
           <span>STAP 0{step} VAN 05</span>
-          <button onClick={() => store.resetAudit()} class="text-[#FF4545]">RESET STATE</button>
+          <button onClick={() => store.resetAudit()} className="text-[#FF4545]">RESET STATE</button>
         </div>
 
         {step === 1 && (
-          <div class="border border-[#242830] bg-[#121417] p-6 space-y-4">
-            <h1 class="text-2xl font-bold text-[#00F0FF]">MF LABS VITE REACT AUDIT ENGINE</h1>
-            <p class="text-[#8A959E]">Volledig functionele React frontend gebouwd met Vite en Node 22.</p>
-            <button onClick={() => setStep(2)} class="px-6 py-3 bg-[#00F0FF] text-black font-bold">START AUDIT -></button>
+          <div className="border border-[#242830] bg-[#121417] p-6 space-y-4">
+            <h1 className="text-2xl font-bold text-[#00F0FF]">MF LABS VITE REACT AUDIT ENGINE</h1>
+            <p className="text-[#8A959E]">Volledig functionele React frontend gebouwd met Vite en Node 22.</p>
+            <button onClick={() => setStep(2)} className="px-6 py-3 bg-[#00F0FF] text-black font-bold">START AUDIT -&gt;</button>
           </div>
         )}
 
         {step === 2 && (
-          <div class="border border-[#242830] bg-[#121417] p-6 space-y-4">
-            <h2 class="text-xl font-bold">BEDRIJFSPROFIEL</h2>
-            <div class="grid grid-cols-2 gap-4">
-              <input value={compName} onChange={(e) => setCompName(e.target.value)} placeholder="Bedrijfsnaam" class="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
-              <input value={compEmail} onChange={(e) => setCompEmail(e.target.value)} placeholder="E-mailadres" class="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
-              <input value={compContact} onChange={(e) => setCompContact(e.target.value)} placeholder="Contactpersoon" class="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
-              <input value={compSector} onChange={(e) => setCompSector(e.target.value)} placeholder="Sector" class="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
+          <div className="border border-[#242830] bg-[#121417] p-6 space-y-4">
+            <h2 className="text-xl font-bold">BEDRIJFSPROFIEL</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <input value={compName} onChange={(e) => setCompName(e.target.value)} placeholder="Bedrijfsnaam" className="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
+              <input value={compEmail} onChange={(e) => setCompEmail(e.target.value)} placeholder="E-mailadres" className="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
+              <input value={compContact} onChange={(e) => setCompContact(e.target.value)} placeholder="Contactpersoon" className="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
+              <input value={compSector} onChange={(e) => setCompSector(e.target.value)} placeholder="Sector" className="bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
             </div>
-            <input value={compTools} onChange={(e) => setCompTools(e.target.value)} placeholder="Software (Gmail, Excel, Exact)" class="w-full bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
-            <button onClick={handleSaveStep2} class="px-6 py-2 bg-[#00F0FF] text-black font-bold">VOLGENDE -></button>
+            <input value={compTools} onChange={(e) => setCompTools(e.target.value)} placeholder="Software (Gmail, Excel, Exact)" className="w-full bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
+            <button onClick={handleSaveStep2} className="px-6 py-2 bg-[#00F0FF] text-black font-bold">VOLGENDE -&gt;</button>
           </div>
         )}
 
         {step === 3 && (
-          <div class="border border-[#242830] bg-[#121417] p-6 space-y-4">
-            <h2 class="text-xl font-bold">WORKFLOWS ({store.workflows.length})</h2>
-            <div class="space-y-2 border border-[#242830] p-4 bg-[#0A0A0B]">
-              <input value={wfName} onChange={(e) => setWfName(e.target.value)} placeholder="Procesnaam (bv. Facturatie)" class="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
-              <input value={wfHours} onChange={(e) => setWfHours(e.target.value)} type="number" placeholder="Uren/wk" class="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
-              <input value={wfKeywords} onChange={(e) => setWfKeywords(e.target.value)} placeholder="Keywords (factuur, email)" class="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
-              <textarea value={wfDesc} onChange={(e) => setWfDesc(e.target.value)} placeholder="Omschrijving knelpunten" class="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
-              <button onClick={handleAddWorkflow} class="px-4 py-2 border border-[#00F0FF] text-[#00F0FF] font-bold">+ TOEVOEGEN</button>
+          <div className="border border-[#242830] bg-[#121417] p-6 space-y-4">
+            <h2 className="text-xl font-bold">WORKFLOWS ({store.workflows.length})</h2>
+            <div className="space-y-2 border border-[#242830] p-4 bg-[#0A0A0B]">
+              <input value={wfName} onChange={(e) => setWfName(e.target.value)} placeholder="Procesnaam (bv. Facturatie)" className="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
+              <input value={wfHours} onChange={(e) => setWfHours(e.target.value)} type="number" placeholder="Uren/wk" className="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
+              <input value={wfKeywords} onChange={(e) => setWfKeywords(e.target.value)} placeholder="Keywords (factuur, email)" className="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
+              <textarea value={wfDesc} onChange={(e) => setWfDesc(e.target.value)} placeholder="Omschrijving knelpunten" className="w-full bg-[#121417] border border-[#242830] p-2 text-white outline-none" />
+              <button onClick={handleAddWorkflow} className="px-4 py-2 border border-[#00F0FF] text-[#00F0FF] font-bold">+ TOEVOEGEN</button>
             </div>
-            <div class="space-y-2">
+            <div className="space-y-2">
               {store.workflows.map((w) => (
-                <div key={w.id} class="border border-[#242830] p-3 flex justify-between bg-[#0A0A0B]">
+                <div key={w.id} className="border border-[#242830] p-3 flex justify-between bg-[#0A0A0B]">
                   <div>
-                    <div class="font-bold">{w.processName} ({w.timeSpentPerWeek}u/wk)</div>
-                    <div class="text-xs text-[#8A959E]">{w.description}</div>
+                    <div className="font-bold">{w.processName} ({w.timeSpentPerWeek}u/wk)</div>
+                    <div className="text-xs text-[#8A959E]">{w.description}</div>
                   </div>
-                  <button onClick={() => store.removeWorkflow(w.id)} class="text-[#FF4545]">VERWIJDER</button>
+                  <button onClick={() => store.removeWorkflow(w.id)} className="text-[#FF4545]">VERWIJDER</button>
                 </div>
               ))}
             </div>
-            <button onClick={() => setStep(4)} class="px-6 py-2 bg-[#00F0FF] text-black font-bold">VOLGENDE -></button>
+            <button onClick={() => setStep(4)} className="px-6 py-2 bg-[#00F0FF] text-black font-bold">VOLGENDE -&gt;</button>
           </div>
         )}
 
         {step === 4 && (
-          <div class="border border-[#242830] bg-[#121417] p-6 space-y-4">
-            <h2 class="text-xl font-bold">PRIVACY & ANALSE RUNNER</h2>
-            <input value={privLocs} onChange={(e) => setPrivLocs(e.target.value)} placeholder="Data locaties (Google Drive, OneDrive)" class="w-full bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
-            <textarea value={privRisks} onChange={(e) => setPrivRisks(e.target.value)} placeholder="Privacy risico's" class="w-full bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
-            <button onClick={runEngine} class="px-6 py-3 bg-[#00F0FF] text-black font-bold">RUN ENGINE ⚡</button>
+          <div className="border border-[#242830] bg-[#121417] p-6 space-y-4">
+            <h2 className="text-xl font-bold">PRIVACY & ANALSE RUNNER</h2>
+            <input value={privLocs} onChange={(e) => setPrivLocs(e.target.value)} placeholder="Data locaties (Google Drive, OneDrive)" className="w-full bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
+            <textarea value={privRisks} onChange={(e) => setPrivRisks(e.target.value)} placeholder="Privacy risico's" className="w-full bg-[#0A0A0B] border border-[#242830] p-2 text-white outline-none" />
+            <button onClick={runEngine} className="px-6 py-3 bg-[#00F0FF] text-black font-bold">RUN ENGINE ⚡</button>
           </div>
         )}
 
         {step === 5 && (
-          <div class="border border-[#242830] bg-[#121417] p-6 space-y-4">
-            <h2 class="text-xl font-bold text-[#00F0FF]">ANALYSE RESULTATEN & IKEA BOUWPLAN</h2>
-            <div class="grid grid-cols-2 gap-4">
+          <div className="border border-[#242830] bg-[#121417] p-6 space-y-4">
+            <h2 className="text-xl font-bold text-[#00F0FF]">ANALYSE RESULTATEN & IKEA BOUWPLAN</h2>
+            <div className="grid grid-cols-2 gap-4">
               {store.components.map((c, i) => (
-                <div key={c.id} class="border border-[#242830] bg-[#0A0A0B] p-4 space-y-2">
-                  <div class="flex justify-between text-xs text-[#00F0FF]">
+                <div key={c.id} className="border border-[#242830] bg-[#0A0A0B] p-4 space-y-2">
+                  <div className="flex justify-between text-xs text-[#00F0FF]">
                     <span>ONDERDEEL 0{i + 1}</span>
                     <span>IMPACT: {c.impactScore}/10</span>
                   </div>
-                  <h3 class="font-bold">{c.title}</h3>
-                  <p class="text-xs text-[#8A959E]">{c.description}</p>
-                  <div class="text-xs pt-2 border-t border-[#242830]">
+                  <h3 className="font-bold">{c.title}</h3>
+                  <p className="text-xs text-[#8A959E]">{c.description}</p>
+                  <div className="text-xs pt-2 border-t border-[#242830]">
                     TOOLS: {c.requiredTools.join(', ')}
                   </div>
                 </div>
